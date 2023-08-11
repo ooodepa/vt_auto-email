@@ -1,4 +1,3 @@
-import os
 from PyScripts.wnd import Window
 
 if __name__ == "__main__":

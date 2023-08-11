@@ -7,16 +7,17 @@ from tkinter import filedialog
 import ssl
 
 
-def get_mail(sender, receivers, subject):
+def get_mail(sender, subject):
     html_file_path = filedialog.askopenfilename(
         filetypes=[("HTML Files", "*.html")],
         initialdir=os.path.join(os.getcwd(), "HTML Mails"),
         title="HTML")
+
     with open(html_file_path, "r", encoding="utf-8") as file:
         html_content = file.read()
+
     message = MIMEMultipart()
     message["From"] = sender
-    message["To"] = ", ".join(receivers)
     message["Subject"] = subject
 
     message.attach(MIMEText(html_content, "html"))
@@ -33,7 +34,7 @@ def get_mail(sender, receivers, subject):
     return message
 
 
-def send_email(sender, password, message, port=465):
+def send_email(sender, receivers, password, message, port=465):
     smtp_server = "smtp." + sender.split('@')[-1]
 
     # Create an SSL context to use SSL for SMTP
@@ -41,4 +42,6 @@ def send_email(sender, password, message, port=465):
 
     with smtplib.SMTP_SSL(host=smtp_server, port=port, context=context) as server:
         server.login(sender, password)
-        server.send_message(message)
+        for receiver in receivers:
+            message["To"] = receiver
+            server.send_message(message)
